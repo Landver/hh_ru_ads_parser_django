@@ -1,0 +1,40 @@
+version: '3.9'
+services:
+  pgdb:
+    image: postgres:13
+    container_name: pgdb
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+  django:
+    build: .
+    command: python manage.py runserver 0.0.0.0:80
+    volumes:
+      - .:/usr/src/hh_ru_django
+    ports:
+      - "80:80"
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 65.21.6.232
+      - CELERY_BROKER=redis://redis:6379/0/
+      - SECRET_KEY='$eg8idk$k-6m(9#8-23fk_ta5ga$@!^ex6mqut_%+-d)2=lm!_'
+    depends_on:
+      - pgdb
+      - redis
+  celery:
+    build: .
+    command: celery -A hh_ru_django worker --loglevel=info
+    volumes:
+      - .:/usr/src/hh_ru_django
+    depends_on:
+      - django
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+volumes:
+  pgdata:
+    
