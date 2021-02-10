@@ -20,7 +20,7 @@ services:
       - DEBUG=1
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 65.21.6.232
       - CELERY_BROKER=redis://redis:6379/0/
-      - SECRET_KEY='$eg8idk$k-6m(9#8-23fk_ta5ga$@!^ex6mqut_%+-d)2=lm!_'
+      - SECRET_KEY=''
     depends_on:
       - pgdb
       - redis
