@@ -1,15 +1,15 @@
 from django.db import models
+from .behaviours import BaseInfo
 
-# Create your models here.
 
-
-class Ad(models.Model):
-    title = models.CharField(max_length=64)
+class Ad(BaseInfo):
+    title = models.CharField(max_length=128)
     company_name = models.CharField(max_length=64)
     city = models.CharField(max_length=32)
-    work_experience = models.CharField(max_length=20)
-    employment_type = models.CharField(max_length=32)
-    schedule = models.CharField(max_length=16)
-    description = models.TextField()
     salary = models.IntegerField(null=True, blank=True)
-    phone = models.CharField(null=True, blank=True)
+    work_experience = models.CharField(max_length=32)
+    employment_type = models.CharField(max_length=48)
+    description = models.TextField()
+    vacancy_url = models.CharField(max_length=128, null=True, blank=True)
+    phone = models.CharField(max_length=32, null=True, blank=True)
+    email = models.EmailField(max_length=254, null=True, blank=True)

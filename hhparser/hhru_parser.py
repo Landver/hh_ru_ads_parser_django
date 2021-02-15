@@ -1,23 +1,26 @@
+import time
+import requests
+# from pyvirtualdisplay import Display
+
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-
-
-PATH = "C:/Program Files (x86)/chromedriver.exe"
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class HhruParser:
     '''Скрапер для hh.ru'''
     def __init__(self, **kwargs):
         '''Инициализируем драйвер браузера'''
-        if kwargs['browser'] == 'Chrome':
-            self.driver = webdriver.Chrome(executable_path=kwargs['path_to_driver'])
-            self.driver.get(kwargs['url'])
-        elif kwargs['browser'] == 'Firefox':
-            self.driver = webdriver.Firefox(executable_path=kwargs['path_to_driver'])
-            self.driver.get(kwargs['url'])
+        caps = DesiredCapabilities.CHROME
+        self.driver = webdriver.Remote(
+            command_executor='http://65.21.6.232:4444/wd/hub',
+            desired_capabilities=caps)
 
     def get_page_blocks(self):
         '''Получаем блок со стрницами в футере сайта hh.ru'''
@@ -30,9 +33,10 @@ class HhruParser:
         pages = page_block.find_elements_by_class_name("bloko-button")[0].text
         return pages
 
-    def next_page(self, page_block):
+    def next_page(self):
         '''Переходит на следующую страницу'''
-        self.driver.find_element(By.XPATH, '//a[text()="дальше"]').click()
+        next_page = self.driver.find_element_by_css_selector('[data-qa="pager-next"]')
+        ActionChains(self.driver).click(next_page).perform()
 
     def get_list_of_ads(self):
         '''Получаем список объявлений на одной странице'''
@@ -45,7 +49,9 @@ class HhruParser:
 
     def get_title(self, ad):
         '''Получаем название объявления'''
-        name = ad.find_elements_by_class_name("g-user-content")[0].text
+        name = WebDriverWait(ad, 2).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="vacancy-serp__vacancy-title"]'))
+        ).text
         return name
 
     def get_city(self, ad):
@@ -54,39 +60,47 @@ class HhruParser:
     def get_company_name(self, ad):
         return ad.find_element_by_class_name("vacancy-serp-item__meta-info-company").text
 
-    def get_description(self, ad):
-        '''Получаем описание
-           Работает только если мы перешли к деталям объявления (либо при помощи ссылки либо при помощи метода go_ad_detail)
-        '''
-        ad.find_elements_by_class_name("g-user-content")[0].click()
+    def get_detail_page(self, ad):
+        detail = ad.find_element_by_css_selector('[data-qa="vacancy-serp__vacancy-title"]')
+        ActionChains(self.driver).click(detail).perform()
         self.driver.switch_to.window(self.driver.window_handles[1])
-        description = self.driver.find_element_by_class_name("vacancy-description").text
-        description_list = description.split('\n')
-        work_experience = description_list[0].split(': ')
-        working_day = description_list[1].split(', ')
-        if "\nКлючевые навыки" in description:
-            description = '\n'.join(description_list[2:]).split("\nКлючевые навыки")[0]
-        else:
-            description = '\n'.join(description_list[2:]).split("\nПоказать на большой карте")[0]
+
+    def close_detail_page(self):
         self.driver.close()
         self.driver.switch_to.window(self.driver.window_handles[0])
-        return {'work_experience': work_experience[1], 'working_day': working_day, 'description': description}
 
-    def get_phone(self, ad):
+    def get_experience(self):
+        '''Работает только после получения детальной страницы'''
+        try:
+            return self.driver.find_element_by_css_selector('[data-qa="vacancy-experience"]').text
+        except:
+            return ""
+
+    def get_type_of_employment(self):
+        try:
+            return self.driver.find_element_by_css_selector('[data-qa="vacancy-view-employment-mode"]').text
+        except:
+            return ""
+
+    def get_description(self):
+        try:
+            return self.driver.find_element_by_css_selector('[data-qa="vacancy-description"]').text
+        except:
+            return ""
+    def get_phone(self):
         '''Получаем номер телефона'''
-        if ad.find_elements_by_class_name("vacancy-serp-item__control"):
-            phone = ad.find_elements_by_class_name("vacancy-serp-item__control")[0]
-            phone.click()
-            try:
-                number = WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "vacancy-contacts__phone-text"))
-                )
-                return number.text
-            except:
-                return "Номер отсутствует"
-            phone.click()
-        else:
-            return "Номер отсутствует"
+        try:
+            phone = self.driver.find_element_by_css_selector('[data-qa="vacancy-contacts__phone"]').text
+            phone = phone.split(',')[0]
+            return phone
+        except:
+            return ""
+
+    def get_email(self):
+        try:
+            return self.driver.find_element_by_css_selector('[data-qa="vacancy-contacts__email"]').text
+        except:
+            return ""
 
     def get_first_page(self, ad):
         '''Переходит на первую страницу'''
@@ -96,12 +110,21 @@ class HhruParser:
         except NoSuchElementException:
             print("Нет кнопки в начало")
 
+    def show_contacts(self):
+        try:
+            contacts = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="show-employer-contacts"]')))
+            ActionChains(self.driver).click(contacts).perform()
+        except:
+            print('Нет данных о контактах')
+        time.sleep(0.2)
+
     def get_salary(self, ad):
         '''Получаем зарплату на вакансии
         '''
         try:
             salary = ad.find_element_by_css_selector("[data-qa='vacancy-serp__vacancy-compensation']").text
-        except NoSuchElementException:
+        except:
             salary = None
         if salary is None:
             return salary
@@ -109,19 +132,7 @@ class HhruParser:
             '''Преобразуем зарплату в том случае если она дается в диапазоне'''
             salary = salary.split('-')
             min_salary = int(''.join(salary[0].split(' ')))
-            max_salary = int(''.join(list(filter(lambda x: x if x.isdigit() else None, salary[1].split(' ')))))
-            return min_salary, max_salary
+            return min_salary
         else:
             '''Преобразуем зарплату в другом случае'''
             return int(''.join(list(filter(lambda x: x if x.isdigit() else None, salary.split(' ')))))
-
-
-parser = HhruParser(path_to_driver=PATH, browser='Chrome', url="https://hh.ru/search/vacancy?order_by=publication_time&clusters=true&area=113&enable_snippets=true")
-ads = parser.get_list_of_ads()
-ad = parser.get_ad(ads, 0)
-print(parser.get_title(ad))
-print(parser.get_company_name(ad))
-print(parser.get_city(ad))
-print(parser.get_description(ad))
-print(parser.get_salary(ad))
-print(parser.get_phone(ad))

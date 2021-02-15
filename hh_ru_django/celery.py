@@ -2,6 +2,8 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
+from celery.schedules import crontab
+
 from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
@@ -14,5 +16,14 @@ app = Celery('hh_ru_django')
 # pickle the object when using Windows.
 app.config_from_object('django.conf:settings', namespace="CELERY")
 
+app.conf.timezone = 'Europe/Moscow'
+
+app.conf.beat_schedule = {
+    'parser_hh': {
+        'task': 'ads.tasks.scrape_ads',
+        'schedule': crontab(hour="*/12"),
+        'args': (),
+    }
+}
 
 app.autodiscover_tasks()
