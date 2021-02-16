@@ -1,13 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 
-import requests
-
 from .scrapers import parser_hh
 
 from celery import shared_task
 
 
 url = "https://hh.ru/search/vacancy?L_is_autosearch=false&area=113&clusters=true&enable_snippets=true&only_with_salary=true&order_by=publication_time&search_period=1&page=0"
+
 
 @shared_task
 def scrape_ads():

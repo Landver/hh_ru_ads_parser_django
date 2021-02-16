@@ -16,7 +16,7 @@ class BaseInfo(models.Model):
     modified_date = models.DateTimeField(editable=False, blank=True, default=datetime.now)
     created_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                                    null=True, blank=True, related_name=related + '_created_by')
-    modified_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, 
+    modified_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                                     null=True, blank=True, default=None, related_name=related + '_modified_by')
 
     def __str__(self):

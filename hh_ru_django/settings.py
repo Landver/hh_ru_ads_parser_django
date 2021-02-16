@@ -96,7 +96,62 @@ DATABASES = {
 
 LOGGING = {
     'version': 1,
-    
+    'disable_existing_loggers': False,
+    'root':
+    {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'formatters':
+    {
+        'verbose':
+        {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple':
+        {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers':
+    {
+        'console':
+        {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file':
+        {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': '/usr/src/hh_ru_django/hh_ru_django/logs/debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers':
+    {
+        'django':
+        {
+            'handlers': ['file', 'console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'ads':
+        {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    },
+    'filters':
+    {
+        'require_debug_true':
+        {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
 }
 
 # Password validation
