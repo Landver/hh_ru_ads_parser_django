@@ -8,6 +8,7 @@ import logging
 
 logger = logging.getLogger('ads')
 
+
 class AdListView(generics.ListCreateAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
@@ -18,6 +19,6 @@ class AdDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AdSerializer
     lookup_field = 'id'
 
-    def get(self, request, *args, **kwargs):
-        logger.info(f'Got the page with id: {request.data["id"]}')
+    def get(self, request, id, *args, **kwargs):
+        logger.info(f'Got the page with id: {str(id)}')
         return self.retrieve(request, *args, **kwargs)

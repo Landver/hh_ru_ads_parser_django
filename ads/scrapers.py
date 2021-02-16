@@ -4,7 +4,6 @@ from hhparser.hhru_parser import HhruParser
 
 
 def parser_hh(url):
-    print('hello')
     parser = HhruParser()
     parser.driver.get(url)
     for page in range(1, 40):
@@ -18,7 +17,7 @@ def parser_hh(url):
             work_experience = parser.get_experience()
             type_of_employment = parser.get_type_of_employment()
             description = parser.get_description()
-            url = parser.driver.current_url.split('?')[0]
+            url = parser.get_current_url()
             parser.show_contacts()
             phone = parser.get_phone()
             email = parser.get_email()

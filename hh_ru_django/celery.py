@@ -21,7 +21,7 @@ app.conf.timezone = 'Europe/Moscow'
 app.conf.beat_schedule = {
     'parser_hh': {
         'task': 'ads.tasks.scrape_ads',
-        'schedule': crontab(hour="*/12"),
+        'schedule': crontab(hour=17),
         'args': (),
     }
 }
