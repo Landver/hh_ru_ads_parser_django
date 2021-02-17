@@ -1,5 +1,4 @@
-Create config.env file in the root of project<br>
-SET environment variables in config.env<br>
+<h2>Create config.env file in the root of project and set environment variables in config.env</h2>
 
 SECRET_KEY=(your secret key for django project)<br>
 DJANGO_DEBUG=(True or False)<br>
