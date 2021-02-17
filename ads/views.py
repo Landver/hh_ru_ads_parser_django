@@ -27,3 +27,7 @@ class AdDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
     lookup_field = 'id'
+
+    def get(self, request, id, *args, **kwargs):
+        logger.info(f'Got the page with id: {str(id)}')
+        return self.retrieve(request, *args, **kwargs)
