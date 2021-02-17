@@ -10,3 +10,6 @@ CELERY_BACKEND=redis://redis:6379/0<br>
 SE_EVENT_BUS_HOST=selenium-hub<br>
 SE_EVENT_BUS_PUBLISH_PORT=4442<br>
 SE_EVENT_BUS_SUBSCRIBE_PORT=4443<br>
+
+
+To run, open shell in the root of your project, and write docker-compose up
