@@ -96,7 +96,62 @@ DATABASES = {
 
 LOGGING = {
     'version': 1,
-    
+    'disable_existing_loggers': False,
+    'root':
+    {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'formatters':
+    {
+        'verbose':
+        {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple':
+        {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers':
+    {
+        'console':
+        {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file':
+        {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'hh_ru_django/logs/debug.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers':
+    {
+        'django':
+        {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'ads':
+        {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    },
+    'filters':
+    {
+        'require_debug_true':
+        {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
 }
 
 # Password validation
@@ -116,6 +171,12 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
 
 
 # Internationalization
@@ -140,3 +201,6 @@ STATIC_URL = '/static/'
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
