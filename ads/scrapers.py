@@ -4,9 +4,13 @@ from hhparser.hhru_parser import HhruParser
 
 
 def parser_hh(url):
+    '''
+        Запускает движок браузера и начинает парсить сайт hh.ru
+        Активируется из под celery
+    '''
     parser = HhruParser()
     parser.driver.get(url)
-    for page in range(1, 40):
+    for page in range(1, 40):  # число 40 это максимальное число страниц в поиске hh.ru
         ads = parser.get_list_of_ads()
         for ad in ads:
             title = parser.get_title(ad)

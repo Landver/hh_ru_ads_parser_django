@@ -16,7 +16,7 @@ from environ import Env
 
 env = Env()
 
-env.read_env(env_file='config/.env')
+env.read_env(env_file='./config.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
