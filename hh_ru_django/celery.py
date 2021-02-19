@@ -21,9 +21,17 @@ app.conf.timezone = 'Europe/Moscow'
 app.conf.beat_schedule = {
     'parser_hh': {
         'task': 'ads.tasks.scrape_ads',
-        'schedule': crontab(hour=11),
+        'schedule': crontab(hour='*/1'),
         'args': (),
     }
 }
 
+
+app.conf.beat_schedule = {
+    'contacts_parser': {
+        'task': 'ads.tasks.contacts_collector',
+        'schedule': crontab(day_of_week='*/24'),
+        'args': ()
+    }
+}
 app.autodiscover_tasks()

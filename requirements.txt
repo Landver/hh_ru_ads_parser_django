@@ -1,10 +1,10 @@
-Django>=3.0,<4.0
-psycopg2-binary>=2.8
-djangorestframework>=3.12.2
+Django==3.1.6
+psycopg2-binary==2.8
+djangorestframework==3.12.2
 celery==4.4
 redis
 flower
 django-environ
 requests
 selenium
-django-celery-beat
+django-celery-beat==2.2.0

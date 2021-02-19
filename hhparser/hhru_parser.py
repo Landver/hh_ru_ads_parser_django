@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options
 
 
 class HhruParser:
@@ -16,9 +17,22 @@ class HhruParser:
         '''Инициализируем драйвер браузера'''
         # copy используется обязательно, без этого метода драйвер не заработает
         caps = DesiredCapabilities.CHROME.copy()
-        self.driver = webdriver.Remote(
-            command_executor='http://65.21.6.232:4444',
-            desired_capabilities=caps)
+        options = Options()
+        if 'no-javascript' in args:
+            options.add_experimental_option( "prefs",{'profile.managed_default_content_settings.javascript': 2})
+            self.driver = webdriver.Remote(
+                command_executor='http://65.21.6.232:4444',
+                desired_capabilities=caps,
+                options=options
+                )
+            self.driver.maximize_window()
+        else:
+            self.driver = webdriver.Remote(
+                command_executor='http://65.21.6.232:4444',
+                desired_capabilities=caps,
+                )
+            self.driver.maximize_window()
+
         # self.driver = webdriver.Chrome(executable_path="C:\\Users\\Computer\\Desktop\\chromedriver.exe")
 
     def get_page_blocks(self):
@@ -157,50 +171,10 @@ class HhruParser:
 
 
 if __name__ == "__main__":
-    url = "https://hh.ru/search/vacancy?L_is_autosearch=false&area=113&clusters=true&enable_snippets=true&only_with_salary=true&order_by=publication_time&search_period=1&page=0"
-
-    def parser_hh(url):
-        print('hello')
-        parser = HhruParser()
-        parser.driver.get(url)
-        for page in range(1, 40):
-            ads = parser.get_list_of_ads()
-            for ad in ads:
-                title = parser.get_title(ad)
-                company_name = parser.get_company_name(ad)
-                city = parser.get_city(ad)
-                salary = parser.get_salary(ad)
-                parser.get_detail_page(ad)
-                work_experience = parser.get_experience()
-                type_of_employment = parser.get_type_of_employment()
-                description = parser.get_description()
-                url = parser.get_current_url()
-                parser.show_contacts()
-                phone = parser.get_phone()
-                email = parser.get_email()
-                parser.close_detail_page()
-                print(title)
-                print(company_name)
-                print(city)
-                print(salary)
-                print(work_experience)
-                print(type_of_employment)
-                print(description)
-                print(url)
-                print(phone)
-                print(email)
-                r = requests.post("http://65.21.6.232/api/v1/ads/", {'title': title,
-                                                                     'company_name': company_name,
-                                                                     'city': city,
-                                                                     'salary': salary,
-                                                                     'work_experience': work_experience,
-                                                                     'employment_type': type_of_employment,
-                                                                     'description': description,
-                                                                     'vacancy_url': url,
-                                                                     'phone': phone,
-                                                                     'email': email})
-                print(r.status_code)
-            parser.next_page()
-        parser.driver.quit()
-
-    parser_hh(url)
+    host_url = "https://rostov.hh.ru/search/vacancy?L_save_area=true&clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&showClusters=true"
+    parser = HhruParser('no-javascript')
+    parser.driver.get(host_url)
+    ads = parser.get_list_of_ads()
+    ad = parser.get_ad(ads, 5)
+    salary = parser.get_salary(ad)
+    print(salary)

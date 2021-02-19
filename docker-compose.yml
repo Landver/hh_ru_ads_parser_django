@@ -1,70 +1,58 @@
 version: '3.0'
+
+volumes:
+  pgdata:
+
 services:
   pgdb:
-    image: postgres:13
-    container_name: pgdb
-    environment:
-      - POSTGRES_DB=<db>
-      - POSTGRES_USER=<user>
-      - POSTGRES_PASSWORD=<password>
+    image: postgres:13.1
+    env_file: "hh_ru_django/config.env"
     volumes:
       - pgdata:/var/lib/postgresql/data/
   django:
     build: .
-    command: python manage.py runserver 0.0.0.0:80
+    command: python manage.py runserver 0.0.0.0:8888
     volumes:
       - .:/usr/src/hh_ru_django
     ports:
-      - "80:80"
-    environment:
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 65.21.6.232
-      - CELERY_BROKER=redis://redis:6379/0
+      - "8888:8888"
+    env_file: "hh_ru_django/config.env"
     depends_on:
       - pgdb
       - redis
       - celery
-  chrome:
+  celery:
+    build: .
+    command: celery -A hh_ru_django worker --beat --broker=redis://redis:6379/0
+    volumes:
+      - .:/usr/src/hh_ru_django
+    depends_on:
+      - chrome
+  flower: # нужен для отслеживания задач celery при помощи графического интерфейса
+    build: .
+    command: flower -A hh_ru_django --beat --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - 5555:5555
+    env_file: "hh_ru_django/config.env"
+    depends_on:
+      - django
+  chrome:  # это движок chrome для selenium
     image: selenium/node-chrome:4.0.0-beta-1-20210215
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
       - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    env_file: "hh_ru_django/config.env"
     ports:
       - "6900:5900"
-  selenium-hub:
+  selenium-hub:  # это агрегатор движков Selenium
     image: selenium/hub:4.0.0-beta-1-20210215
     ports:
       - "4442:4442"
       - "4443:4443"
       - "4444:4444"
-  celery:
-    build: .
-    command: celery -A hh_ru_django worker -B --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - .:/usr/src/hh_ru_django
-    depends_on:
-      - selenium-hub
   redis:
-    image: redis
+    image: redis:6.0.10
     ports:
       - '6379:6379'
-  flower:
-    build: .
-    command: flower -A hh_ru_django -B --port=5555 --broker=redis://redis:6379/0 --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    ports:
-      - 5555:5555
-    environment:
-      - CELERY_BROKER=redis://redis:6379/0
-      - CELERY_BACKEND=redis://redis:6379/0
-    depends_on:
-      - django
-      - redis
-      - celery
-      - selenium-hub
-volumes:
-  pgdata:
     

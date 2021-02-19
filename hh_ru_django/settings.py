@@ -16,7 +16,7 @@ from environ import Env
 
 env = Env()
 
-env.read_env(env_file='config/.env')
+env.read_env(env_file='./config.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -96,7 +96,7 @@ DATABASES = {
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'root':
     {
         'handlers': ['console'],
@@ -144,13 +144,6 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         }
-    },
-    'filters':
-    {
-        'require_debug_true':
-        {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
     },
 }
 
