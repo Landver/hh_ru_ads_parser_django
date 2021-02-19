@@ -10,7 +10,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
 
-
+PATH = 'C:\\Users\\Computer\\Desktop\\chromedriver.exe'
 class HhruParser:
     '''Скрапер для hh.ru'''
     def __init__(self, *args, **kwargs):
@@ -19,7 +19,7 @@ class HhruParser:
         caps = DesiredCapabilities.CHROME.copy()
         options = Options()
         if 'no-javascript' in args:
-            options.add_experimental_option( "prefs",{'profile.managed_default_content_settings.javascript': 2})
+            options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
             self.driver = webdriver.Remote(
                 command_executor='http://65.21.6.232:4444',
                 desired_capabilities=caps,
@@ -66,18 +66,28 @@ class HhruParser:
         '''Получаем одно объявление из списка страниц'''
         return list_of_ads[index_of_ad]
 
-    def get_title(self, ad):
+    def get_title(self):
         '''Получаем название объявления'''
-        name = WebDriverWait(ad, 20).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="vacancy-serp__vacancy-title"]'))
-        ).text
+        try:
+            name = WebDriverWait(self.driver, 20).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="vacancy-title"]'))
+            ).text
+        except:
+            name = ''
         return name
 
-    def get_city(self, ad):
-        return ad.find_element_by_css_selector('[data-qa="vacancy-serp__vacancy-address"]').text.split(', ')[0]
+    def get_address(self):
+        try:
+            city = self.driver.find_element_by_css_selector('[data-qa="vacancy-view-raw-address"]')
+        except:
+            city = self.driver.find_element_by_css_selector('[data-qa="vacancy-view-location"]')
+        return city.text.split(', ')[0]
 
-    def get_company_name(self, ad):
-        return ad.find_element_by_class_name("vacancy-serp-item__meta-info-company").text
+    def get_company_name(self):
+        try:
+            return self.driver.find_element_by_css_selector('[data-qa="vacancy-company-name"]').text
+        except:
+            return ''
 
     def get_detail_page(self, ad):
         detail = ad.find_element_by_css_selector('[data-qa="vacancy-serp__vacancy-title"]')
@@ -151,30 +161,19 @@ class HhruParser:
             print('Нет данных о контактах')
         time.sleep(0.2)
 
-    def get_salary(self, ad):
+    def get_salary(self):
         '''Получаем зарплату на вакансии
         '''
         try:
-            salary = ad.find_element_by_css_selector("[data-qa='vacancy-serp__vacancy-compensation']").text
-        except:
-            salary = None
-        if salary is None:
+            salary = self.driver.find_element_by_class_name("vacancy-salary").text
+            if salary == 'з/п не указана':
+                return None
+            salary = int(''.join(salary.split(' ')[1:3]))
             return salary
-        elif '-' in salary:
-            '''Преобразуем зарплату в том случае если она дается в диапазоне'''
-            salary = salary.split('-')
-            min_salary = int(''.join(salary[0].split(' ')))
-            return min_salary
-        else:
-            '''Преобразуем зарплату в другом случае'''
-            return int(''.join(list(filter(lambda x: x if x.isdigit() else None, salary.split(' ')))))
+        except:
+            return None
 
 
 if __name__ == "__main__":
-    host_url = "https://rostov.hh.ru/search/vacancy?L_save_area=true&clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&showClusters=true"
-    parser = HhruParser('no-javascript')
-    parser.driver.get(host_url)
-    ads = parser.get_list_of_ads()
-    ad = parser.get_ad(ads, 5)
-    salary = parser.get_salary(ad)
-    print(salary)
+    host_url = "https://rostov.hh.ru/search/vacancy?clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&L_save_area=true&area=113&from=cluster_area&showClusters=true"
+    
