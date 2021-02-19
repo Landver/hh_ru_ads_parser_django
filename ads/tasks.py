@@ -13,6 +13,7 @@ def scrape_ads():
     parser_hh(url)
     return
 
+
 @shared_task
 def contacts_collector():
     scrape_contacts()
