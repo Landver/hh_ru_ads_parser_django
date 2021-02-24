@@ -1,5 +1,4 @@
 import time
-import requests
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,14 +10,18 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
 
 PATH = 'C:\\Users\\Computer\\Desktop\\chromedriver.exe'
+
+
 class HhruParser:
     '''Скрапер для hh.ru'''
     def __init__(self, *args, **kwargs):
         '''Инициализируем драйвер браузера'''
         # copy используется обязательно, без этого метода драйвер не заработает
         caps = DesiredCapabilities.CHROME.copy()
-        options = Options()
+        caps |= {'maxInstances': 4}
+        print(caps)
         if 'no-javascript' in args:
+            options = Options()
             options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
             self.driver = webdriver.Remote(
                 command_executor='http://65.21.6.232:4444',
@@ -176,4 +179,6 @@ class HhruParser:
 
 if __name__ == "__main__":
     host_url = "https://rostov.hh.ru/search/vacancy?clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&L_save_area=true&area=113&from=cluster_area&showClusters=true"
-    
+    parser = HhruParser()
+    parser.get('https://www.google.com')
+    time.sleep(20)

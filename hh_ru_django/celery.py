@@ -18,6 +18,7 @@ app.config_from_object('django.conf:settings', namespace="CELERY")
 
 app.conf.timezone = 'Europe/Moscow'
 
+
 app.conf.beat_schedule = {
     'parser_hh': {
         'task': 'ads.tasks.scrape_ads',
@@ -26,7 +27,7 @@ app.conf.beat_schedule = {
     },
     'contacts_parser': {
         'task': 'ads.tasks.contacts_collector',
-        'schedule': crontab(day_of_week='*/24'),
+        'schedule': crontab(day_of_week='Wednesday'),
         'args': ()
     }
 }

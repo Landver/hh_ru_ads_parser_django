@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from .scrapers import parser_hh, scrape_contacts
 
 from celery import shared_task
-
+from datetime import datetime
 
 url = "https://rostov.hh.ru/search/vacancy?clusters=true&enable_snippets=true&only_with_salary=true&order_by=publication_time&search_period=1&L_save_area=true&area=113&from=cluster_area&showClusters=true"
 
