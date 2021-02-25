@@ -27,7 +27,7 @@ app.conf.beat_schedule = {
     },
     'contacts_parser': {
         'task': 'ads.tasks.contacts_collector',
-        'schedule': crontab(day_of_week='Wednesday'),
+        'schedule': crontab(day_of_week='Thursday'),
         'args': ()
     }
 }

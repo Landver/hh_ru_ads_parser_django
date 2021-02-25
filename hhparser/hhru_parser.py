@@ -24,14 +24,14 @@ class HhruParser:
             options = Options()
             options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
             self.driver = webdriver.Remote(
-                command_executor='http://65.21.6.232:4444',
+                command_executor='http://135.181.195.100:4444',
                 desired_capabilities=caps,
                 options=options
                 )
             self.driver.maximize_window()
         else:
             self.driver = webdriver.Remote(
-                command_executor='http://65.21.6.232:4444',
+                command_executor='http://135.181.195.100:4444',
                 desired_capabilities=caps,
                 )
             self.driver.maximize_window()
@@ -179,6 +179,4 @@ class HhruParser:
 
 if __name__ == "__main__":
     host_url = "https://rostov.hh.ru/search/vacancy?clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&L_save_area=true&area=113&from=cluster_area&showClusters=true"
-    parser = HhruParser()
-    parser.get('https://www.google.com')
-    time.sleep(20)
+    
