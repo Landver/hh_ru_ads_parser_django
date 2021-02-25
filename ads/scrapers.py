@@ -3,7 +3,7 @@ import requests
 from hhparser.hhru_parser import HhruParser
 
 from .models import Ad
-import time
+
 
 def parser_hh(url):
     '''

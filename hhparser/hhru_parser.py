@@ -179,4 +179,3 @@ class HhruParser:
 
 if __name__ == "__main__":
     host_url = "https://rostov.hh.ru/search/vacancy?clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&L_save_area=true&area=113&from=cluster_area&showClusters=true"
-    
