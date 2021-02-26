@@ -1,4 +1,5 @@
 import time
+import requests
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -10,6 +11,9 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
 
 PATH = 'C:\\Users\\Computer\\Desktop\\chromedriver.exe'
+'''В данном файле все try except нацелены либо на получение данных с сайта hh.ru,
+   не важно какая будет ошибка поэтому они не описаны внутри проверки
+'''
 
 
 class HhruParser:
@@ -35,8 +39,6 @@ class HhruParser:
                 desired_capabilities=caps,
                 )
             self.driver.maximize_window()
-
-        # self.driver = webdriver.Chrome(executable_path="C:\\Users\\Computer\\Desktop\\chromedriver.exe")
 
     def get_page_blocks(self):
         '''Получаем блок со стрницами в футере сайта hh.ru'''
@@ -178,4 +180,32 @@ class HhruParser:
 
 
 if __name__ == "__main__":
-    host_url = "https://rostov.hh.ru/search/vacancy?clusters=true&enable_snippets=true&order_by=publication_time&search_period=1&L_save_area=true&area=113&from=cluster_area&showClusters=true"
+    parser = HhruParser('no-javascript')
+    # Скрипт который нужно запустить для получения данных в заданом диапазоне
+    for i in range(41000000, 42520047):
+        parser.driver.get(f'https://hh.ru/vacancy/{i}')
+        title = parser.get_title()
+        company_name = parser.get_company_name()
+        city = parser.get_address()
+        salary = parser.get_salary()
+        work_experience = parser.get_experience()
+        type_of_employment = parser.get_type_of_employment()
+        description = parser.get_description()
+        if title == '':
+            state = 'Не найдено'
+        elif title != '' and description == '':
+            state = 'В архиве'
+        url = parser.get_current_url()
+        parser.driver.get(f'https://hh.ru/vacancy/{i}')
+        r = requests.post("http://65.21.6.232:8888/api/v1/ads/", {'title': title,
+                                                                  'company_name': company_name,
+                                                                  'city': city,
+                                                                  'salary': salary,
+                                                                  'work_experience': work_experience,
+                                                                  'employment_type': type_of_employment,
+                                                                  'description': description,
+                                                                  'vacancy_url': url,
+                                                                  'phone': "",
+                                                                  'email': "",
+                                                                  'state': state})
+        print(r.status_code)

@@ -93,6 +93,8 @@ DATABASES = {
     }
 }
 
+# Logging
+# https://docs.djangoproject.com/en/3.1/topics/logging/
 
 LOGGING = {
     'version': 1,
@@ -165,7 +167,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# REST FRAMEWORK pagination
+# https://www.django-rest-framework.org/api-guide/pagination/
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
@@ -192,6 +195,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+# Celery
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_ACCEPT_CONTENT = ['application/json']
