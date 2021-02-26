@@ -1,6 +1,6 @@
 # Docker.io нужен для работы сайта
 # Также создайте папку logs в папке hh_ru_django , внутри logs создайте файл debug.log
-# создайте файл config.env в корне проекта и поместите туда данные переменные 
+# Создайте файл config.env в корне проекта и поместите туда данные переменные 
 SECRET_KEY=**"Your secret key for django project"**<br>
 DJANGO_DEBUG=**"True or False"**<br>
 POSTGRES_DB=**"name of your database for postgres, or use your own settings if other db"**<br>
