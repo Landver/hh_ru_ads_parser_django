@@ -21,7 +21,7 @@ class BaseInfo(models.Model):
 
 class Ad(BaseInfo):
     title = models.CharField(max_length=128)
-    company_name = models.CharField(max_length=64)
+    company_name = models.CharField(max_length=128)
     city = models.CharField(max_length=64)
     salary = models.IntegerField(null=True, blank=True)
     work_experience = models.CharField(max_length=64, null=True, blank=True)

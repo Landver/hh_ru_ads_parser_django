@@ -9,3 +9,5 @@ requests
 selenium
 django-celery-beat==2.2.0
 gevent
+graphene-django
+django-filter

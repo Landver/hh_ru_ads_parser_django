@@ -13,11 +13,11 @@ services:
       - "5432:5432"
   django:
     build: .
-    command: python manage.py runserver 0.0.0.0:8888
+    command: python manage.py runserver 0.0.0.0:80
     volumes:
       - .:/usr/src/hh_ru_django
     ports:
-      - "8888:8888"
+      - "80:80"
     env_file: "hh_ru_django/config.env"
     depends_on:
       - pgdb
@@ -31,7 +31,6 @@ services:
     env_file: "hh_ru_django/config.env"
     depends_on:
       - node1
-      # - node2
   flower: # нужен для отслеживания задач celery при помощи графического интерфейса
     build: .
     command: flower -A hh_ru_django --beat --port=5555 --broker=redis://redis:6379/0
@@ -47,13 +46,6 @@ services:
     depends_on:
       - selenium-hub
     env_file: "hh_ru_django/config.env"
-  # node2:  # это движок chrome для selenium
-  #   image: selenium/node-chrome:4.0.0-beta-1-20210215
-  #   volumes:
-  #     - /dev/shm:/dev/shm
-  #   depends_on:
-  #     - selenium-hub
-  #   env_file: "hh_ru_django/config.env"
   selenium-hub:  # это агрегатор движков Selenium
     image: selenium/hub:4.0.0-beta-1-20210215
     ports:
@@ -64,3 +56,7 @@ services:
     image: redis:6.0.10
     ports:
       - '6379:6379'
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    working_dir: /var/lib/redis

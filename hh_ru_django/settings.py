@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'ads.apps.AdsConfig',
     'django_celery_beat',
+    'graphene_django'
 ]
 
 MIDDLEWARE = [
@@ -102,7 +103,7 @@ LOGGING = {
     'root':
     {
         'handlers': ['console'],
-        'level': 'WARNING',
+        'level': 'INFO',
     },
     'formatters':
     {
@@ -137,7 +138,7 @@ LOGGING = {
         'django':
         {
             'handlers': ['console'],
-            'level': 'WARNING',
+            'level': 'INFO',
             'propagate': False,
         },
         'ads':
@@ -201,3 +202,8 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+
+# GraphQL Schema
+GRAPHENE = {
+    "SCHEMA": "hh_ru_django.schema.schema"
+}
