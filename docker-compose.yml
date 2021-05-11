@@ -14,7 +14,7 @@ services:
     restart: always
   django:
     build: .
-    command: python manage.py runserver 0.0.0.0:8888
+    command: python manage.py runserver 0.0.0.0:80
     volumes:
       - .:/usr/src/hh_ru_django
     ports:
