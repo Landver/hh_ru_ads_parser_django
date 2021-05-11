@@ -21,7 +21,7 @@ class BaseInfo(models.Model):
 
 class Ad(BaseInfo):
     title = models.CharField(max_length=128)
-    company_name = models.CharField(max_length=64)
+    company_name = models.CharField(max_length=128)
     city = models.CharField(max_length=64)
     salary = models.IntegerField(null=True, blank=True)
     work_experience = models.CharField(max_length=64, null=True, blank=True)
@@ -30,5 +30,4 @@ class Ad(BaseInfo):
     vacancy_url = models.CharField(max_length=254, null=True, blank=True, unique=True)
     phone = models.CharField(max_length=64, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
-    parsed = models.BooleanField(default=False)
     state = models.CharField(max_length=64, default='normal')

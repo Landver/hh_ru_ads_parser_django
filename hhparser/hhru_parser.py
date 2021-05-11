@@ -1,41 +1,52 @@
 import time
 
+from fake_headers import Headers
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.options import Options
 
-PATH = 'C:\\Users\\Computer\\Desktop\\chromedriver.exe'
+PATH = '/usr/bin/chromium-browser'
+
 '''В данном файле все try except нацелены либо на получение данных с сайта hh.ru,
    не важно какая будет ошибка поэтому они не описаны внутри проверки
 '''
+header = Headers(
+        browser="chrome",  # Generate only Chrome UA
+        os="win",  # Generate ony Windows platform
+        headers=True  # generate misc headers
+        )
 
 
 class HhruParser:
     '''Скрапер для hh.ru'''
     def __init__(self, *args, **kwargs):
         '''Инициализируем драйвер браузера'''
+        options = Options()
+        
+        options.add_argument("--start-maximized")  # open Browser in maximized mode
+        options.add_argument("--no-sandbox")  # bypass OS security model
+        options.add_argument("--headless")
+        options.add_argument("--disable-dev-shm-usage")  # overcome limited resource problems
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
         # copy используется обязательно, без этого метода драйвер не заработает
-        caps = DesiredCapabilities.CHROME.copy()
-        caps |= {'maxInstances': 4}
-        print(caps)
         if 'no-javascript' in args:
-            options = Options()
             options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
             self.driver = webdriver.Remote(
-                command_executor='http://135.181.195.100:4444',
-                desired_capabilities=caps,
-                options=options
+                command_executor='http://<your_ip>:4444/wd/hub',
+                options=options,
                 )
             self.driver.maximize_window()
+            self.driver.header_overrides = header.generate()
         else:
             self.driver = webdriver.Remote(
-                command_executor='http://135.181.195.100:4444',
-                desired_capabilities=caps,
+                command_executor='http://<your_ip>:4444/wd/hub',
+                options=options,
                 )
             self.driver.maximize_window()
 

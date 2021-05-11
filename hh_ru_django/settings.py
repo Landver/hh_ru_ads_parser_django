@@ -12,11 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 
 from pathlib import Path
-from environ import Env
-
-env = Env()
-
-env.read_env(env_file='./config.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DJANGO_DEBUG')
+DEBUG = os.getenv('DJANGO_DEBUG')
 
-ALLOWED_HOSTS = [env('ALLOWED_HOST')]
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST'), '3ca37ecf3d2c']
 
 
 # Application definition
@@ -44,8 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'ads.apps.AdsConfig',
     'django_celery_beat',
+    'graphene_django',
+    'ads',
 ]
 
 MIDDLEWARE = [
@@ -85,9 +81,9 @@ WSGI_APPLICATION = 'hh_ru_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': 'pgdb',
         'PORT': 5432,
     }
@@ -102,7 +98,7 @@ LOGGING = {
     'root':
     {
         'handlers': ['console'],
-        'level': 'WARNING',
+        'level': 'INFO',
     },
     'formatters':
     {
@@ -137,7 +133,7 @@ LOGGING = {
         'django':
         {
             'handlers': ['console'],
-            'level': 'WARNING',
+            'level': 'INFO',
             'propagate': False,
         },
         'ads':
@@ -196,8 +192,13 @@ STATIC_URL = '/static/'
 
 
 # Celery
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+
+# GraphQL Schema
+GRAPHENE = {
+    "SCHEMA": "hh_ru_django.schema.schema"
+}
