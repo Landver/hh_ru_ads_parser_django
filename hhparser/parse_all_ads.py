@@ -1,6 +1,7 @@
 import requests
 from hhru_parser import HhruParser
 from ads.models import Ad
+import os
 
 # Этот скрипт нужно запустить на друг
 def scrape_contacts():
@@ -11,7 +12,8 @@ def scrape_contacts():
         parser.driver.get(ad.vacancy_url)
         phone = parser.get_phone()
         email = parser.get_email()
-        r = requests.patch("http://135.181.195.100:8888/api/v1/ads/{}/".format(str(ad.id)), {'phone': phone, 'email': email, 'parsed': True})
+        ip = os.getenv('ip_address_server')
+        r = requests.patch("http://{}:8890/api/v1/ads/{}/".format(ip, str(ad.id)), {'phone': phone, 'email': email, 'parsed': True})
         print(r.status_code)
         if r.status_code == 200:
             print('Добавлено')

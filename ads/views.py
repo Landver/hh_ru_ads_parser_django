@@ -2,8 +2,6 @@ from rest_framework import generics
 
 from .api.serializers import AdSerializer
 
-from rest_framework.exceptions import ValidationError
-
 from .models import Ad
 
 import logging
@@ -14,6 +12,10 @@ logger = logging.getLogger('ads')
 class AdListView(generics.ListCreateAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
+
+    def post(self, request, *args, **kwargs):
+        logger.info('posted')
+        return self.create(request, *args, **kwargs)
 
 
 class AdDetailView(generics.RetrieveUpdateDestroyAPIView):

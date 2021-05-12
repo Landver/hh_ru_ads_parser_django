@@ -1,4 +1,5 @@
 import time
+import os
 
 from fake_headers import Headers
 
@@ -37,15 +38,16 @@ class HhruParser:
         # copy используется обязательно, без этого метода драйвер не заработает
         if 'no-javascript' in args:
             options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
+            ip = os.getenv("ip_address_server")
             self.driver = webdriver.Remote(
-                command_executor='http://<your_ip>:4444/wd/hub',
+                command_executor=f'http://{ip}:4444/wd/hub',
                 options=options,
                 )
             self.driver.maximize_window()
             self.driver.header_overrides = header.generate()
         else:
             self.driver = webdriver.Remote(
-                command_executor='http://<your_ip>:4444/wd/hub',
+                command_executor=f'http://{ip}:4444/wd/hub',
                 options=options,
                 )
             self.driver.maximize_window()

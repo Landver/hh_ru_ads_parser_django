@@ -1,6 +1,6 @@
 import requests
 from hhparser.hhru_parser import HhruParser
-
+import os
 
 # Этот скрипт нужно запустить на друг
 def parser_hh():
@@ -41,7 +41,8 @@ def parser_hh():
             state = 'В архиве'
         else:
             state = 'normal'
-        r = requests.post("http://135.181.195.100:80/api/v1/ads/", {'title': title,
+        ip = os.getenv('ip_address_server')
+        r = requests.post(f"http://{ip}:8890/api/v1/ads/", {'title': title,
                                                                     'company_name': company_name,
                                                                     'city': city,
                                                                     'salary': salary,

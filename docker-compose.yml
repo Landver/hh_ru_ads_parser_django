@@ -6,7 +6,7 @@ volumes:
 services:
   pgdb:
     image: postgres:13
-    env_file: "hh_ru_django/config.env"
+    env_file: .env
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     ports:
@@ -14,11 +14,11 @@ services:
     restart: always
   django:
     build: .
-    command: python manage.py runserver 0.0.0.0:80
+    command: python manage.py runserver 0.0.0.0:8890
     volumes:
       - .:/usr/src/hh_ru_django
     ports:
-      - "8888:8888"
+      - "8890:8890"
     env_file: .env
     depends_on:
       - pgdb
