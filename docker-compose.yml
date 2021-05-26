@@ -9,8 +9,6 @@ services:
     env_file: .env
     volumes:
       - postgres-data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
     restart: always
   django:
     build: .
@@ -37,16 +35,12 @@ services:
   flower: # нужен для отслеживания задач celery при помощи графического интерфейса
     build: .
     command: flower -A hh_ru_django --beat --port=5555 --broker=redis://redis:6379/0
-    ports:
-      - 5555:5555
     env_file: .env
     depends_on:
       - django
     restart: always
   redis: # Брокер для Celery
     image: redis:6.0.10
-    ports:
-      - '6379:6379'
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
@@ -55,9 +49,6 @@ services:
   chrome:
     image: selenium/standalone-chrome:latest
     hostname: chrome
-    ports:
-      - "5900:5900"
-      - "4444:4444"
     privileged: true
     shm_size: 2g
     restart: always
