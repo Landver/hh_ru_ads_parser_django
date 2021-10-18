@@ -1,4 +1,5 @@
 import time
+import os
 
 from fake_headers import Headers
 
@@ -9,7 +10,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
-
 PATH = '/usr/bin/chromium-browser'
 
 '''В данном файле все try except нацелены либо на получение данных с сайта hh.ru,
@@ -26,29 +26,23 @@ class HhruParser:
     '''Скрапер для hh.ru'''
     def __init__(self, *args, **kwargs):
         '''Инициализируем драйвер браузера'''
-        options = Options()
-        
-        options.add_argument("--start-maximized")  # open Browser in maximized mode
-        options.add_argument("--no-sandbox")  # bypass OS security model
-        options.add_argument("--headless")
-        options.add_argument("--disable-dev-shm-usage")  # overcome limited resource problems
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
         # copy используется обязательно, без этого метода драйвер не заработает
-        if 'no-javascript' in args:
-            options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
-            self.driver = webdriver.Remote(
-                command_executor='http://<your_ip>:4444/wd/hub',
-                options=options,
-                )
-            self.driver.maximize_window()
-            self.driver.header_overrides = header.generate()
-        else:
-            self.driver = webdriver.Remote(
-                command_executor='http://<your_ip>:4444/wd/hub',
-                options=options,
-                )
-            self.driver.maximize_window()
+        ip = os.getenv("ip_address_server")
+        options = Options()
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--disable-crash-reporter")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-in-process-stack-traces")
+        options.add_argument("--disable-logging")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--log-level=3")
+        options.add_argument("--output=/dev/null")    
+        options.add_argument("--no-sandbox")
+        self.driver = webdriver.Remote(f'http://{ip}:4444/wd/hub', options.to_capabilities())
+        self.driver.header_overrides = header.generate()
 
     def get_page_blocks(self):
         '''Получаем блок со стрницами в футере сайта hh.ru'''
@@ -94,9 +88,14 @@ class HhruParser:
     def get_address(self):
         try:
             city = self.driver.find_element_by_css_selector('[data-qa="vacancy-view-raw-address"]')
+            return city.text.split(', ')[0]
         except:
-            city = self.driver.find_element_by_css_selector('[data-qa="vacancy-view-location"]')
-        return city.text.split(', ')[0]
+            try:
+                city = self.driver.find_element_by_css_selector('[data-qa="vacancy-view-location"]')
+                return city.text.split(', ')[0]
+            except:
+                city = ""
+                return city
 
     def get_company_name(self):
         try:

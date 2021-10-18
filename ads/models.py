@@ -31,3 +31,6 @@ class Ad(BaseInfo):
     phone = models.CharField(max_length=64, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
     state = models.CharField(max_length=64, default='normal')
+
+    class Meta:
+        get_latest_by = "created_date"

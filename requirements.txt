@@ -6,7 +6,7 @@ redis
 flower
 django-environ
 requests
-selenium
+selenium==3.0
 django-celery-beat==2.2.0
 gevent
 graphene-django
