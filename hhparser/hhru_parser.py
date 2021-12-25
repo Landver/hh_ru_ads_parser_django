@@ -32,6 +32,7 @@ class HhruParser:
         options.add_argument("--window-size=1920,1080")
         options.add_argument("--no-sandbox")
         options.add_argument("--headless")
+<<<<<<< HEAD
         options.add_argument("--disable-gpu")
         options.add_argument("--disable-crash-reporter")
         options.add_argument("--disable-extensions")
@@ -43,6 +44,27 @@ class HhruParser:
         options.add_argument("--no-sandbox")
         self.driver = webdriver.Remote(f'http://{ip}:4444/wd/hub', options.to_capabilities())
         self.driver.header_overrides = header.generate()
+=======
+        options.add_argument("--disable-dev-shm-usage")  # overcome limited resource problems
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        # copy используется обязательно, без этого метода драйвер не заработает
+        if 'no-javascript' in args:
+            options.add_experimental_option("prefs", {'profile.managed_default_content_settings.javascript': 2})
+            ip = os.getenv("ip_address_server")
+            self.driver = webdriver.Remote(
+                command_executor=f'http://{ip}:4444/wd/hub',
+                options=options,
+                )
+            self.driver.maximize_window()
+            self.driver.header_overrides = header.generate()
+        else:
+            self.driver = webdriver.Remote(
+                command_executor=f'http://{ip}:4444/wd/hub',
+                options=options,
+                )
+            self.driver.maximize_window()
+>>>>>>> f8d948b54fa4ed8840473f1306dcf31de35b1c69
 
     def get_page_blocks(self):
         '''Получаем блок со стрницами в футере сайта hh.ru'''

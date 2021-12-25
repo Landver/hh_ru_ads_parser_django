@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 version: '3.0'
 
 volumes:
@@ -58,3 +59,59 @@ services:
     restart: always
     shm_size: 2g
     env_file: .env
+=======
+version: '3.0'
+
+volumes:
+  postgres-data:
+
+services:
+  pgdb:
+    image: postgres:13
+    env_file: .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    restart: always
+  django:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8890
+    volumes:
+      - .:/usr/src/hh_ru_django
+    ports:
+      - "8890:8890"
+    env_file: .env
+    depends_on:
+      - pgdb
+      - redis
+      - celery
+    restart: always
+  celery:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A hh_ru_django worker --beat --broker=redis://redis:6379/0 --concurrency=2
+    volumes:
+      - .:/usr/src/hh_ru_django
+    env_file: .env
+    restart: always
+  flower: # нужен для отслеживания задач celery при помощи графического интерфейса
+    build: .
+    command: flower -A hh_ru_django --beat --port=5555 --broker=redis://redis:6379/0
+    env_file: .env
+    depends_on:
+      - django
+    restart: always
+  redis: # Брокер для Celery
+    image: redis:6.0.10
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    working_dir: /var/lib/redis
+    restart: always
+  chrome:
+    image: selenium/standalone-chrome:latest
+    hostname: chrome
+    privileged: true
+    shm_size: 2g
+    restart: always
+>>>>>>> f8d948b54fa4ed8840473f1306dcf31de35b1c69
